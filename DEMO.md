@@ -9,4 +9,6 @@
 - Montrer la clé créé
 - Montrer que le token fonctionne
 - Lancer l'app en local avec ngrok `ngrok http 5173`
-- Tenter de se loguer et voir l'erreur
+- Tenter de se signup puis de se loguer et voir l'erreur
+- Montrer les schémas rapidement dans excalidraw en vulgarisant au max
+- Montrer le code de CreateAuthChallenge & VerifyAuthChallenge
