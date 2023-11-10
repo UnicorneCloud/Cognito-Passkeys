@@ -1,14 +1,10 @@
-# Welcome to your CDK TypeScript project
+# Passkey authentication with AWS Cognito
 
-This is a blank project for CDK development with TypeScript.
+Create a simple authenticator with AWS Cognito by using exclusively FIDO2 Authentication.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+> Disclaimer note: Do not use this project directly in production. It may be result of potential data privacy breach, it's just a proof of concept of how to use AWS Cognito with FIDO2 Authentication (Passkeys). You have to adapt it first before using it !
 
 ## Useful commands
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+- `yarn build` compile typescript to js
+- `yarn build` deploy this stack to your default AWS account/region

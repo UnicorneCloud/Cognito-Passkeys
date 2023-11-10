@@ -1,0 +1,140 @@
+#root {
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  width: calc(100vh - 6rem);
+}
+
+body,
+html {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: auto;
+}
+
+h1,
+h2,
+h3,
+div,
+p {
+  font-family: "Readex Pro";
+}
+
+h1,
+h2,
+h3,
+div,
+p {
+  color: #1f0a30;
+}
+
+a {
+  color: #6e2fd3 !important;
+}
+
+.content {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.section {
+  padding: 0 2rem 1rem 2rem;
+  border: 1px solid darkblue;
+  border-radius: 6px;
+  min-height: 500px;
+}
+
+input {
+  width: 250px;
+}
+button {
+  width: 270px;
+  color: #1f0a30 !important;
+  background-color: #19ece6;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logoUnicorne {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 200px;
+}
+
+#snackbar {
+  visibility: hidden;
+  max-width: 500px;
+  background-color: #1f0a30;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 1rem 2rem;
+  position: fixed;
+  z-index: 1;
+  top: 30px;
+  right: 30px;
+  font-size: 17px;
+  color: #ccff66;
+
+  margin-left: auto;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 5s;
+  animation: fadein 0.5s, fadeout 0.5s 5s;
+}
+
+@-webkit-keyframes fadein {
+  from {
+    top: 0;
+    opacity: 0;
+  }
+  to {
+    top: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    top: 0;
+    opacity: 0;
+  }
+  to {
+    top: 30px;
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeout {
+  from {
+    top: 30px;
+    opacity: 1;
+  }
+  to {
+    top: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    top: 30px;
+    opacity: 1;
+  }
+  to {
+    top: 0;
+    opacity: 0;
+  }
+}

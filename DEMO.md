@@ -1,0 +1,12 @@
+- Faire le signup
+- Faire l'activation
+- Montrer le challenge reçu
+- Créer une clé en montrant bien le téléphone en mirroring (credentials.create)
+- Montrer la clé créé
+- montrer le login
+- Montrer le challenge reçu
+- Utiliser une clé en montrant bien le téléphone en mirroring (credentials.get)
+- Montrer la clé créé
+- Montrer que le token fonctionne
+- Lancer l'app en local avec ngrok `ngrok http 5173`
+- Tenter de se loguer et voir l'erreur
