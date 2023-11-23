@@ -91,7 +91,7 @@ export const useProvideAuth = () => {
       if (cognitoUser.authenticationFlowType === "CUSTOM_AUTH") {
         const opts = JSON.parse(cognitoUser.challengeParam.assertionChallenge);
         setResponseDebug(opts);
-        const attResp = await startAuthentication(opts, true);
+        const attResp = await startAuthentication(opts);
         setResponseDebug({
           ...attResp,
           response: {
