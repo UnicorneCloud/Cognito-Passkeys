@@ -23,11 +23,12 @@ export const handler: CreateAuthChallengeTriggerHandler = (event, context) => {
   if (!!event.request.userAttributes["custom:activationCode"]) {
     return webAuthnProvider.generateRegistrationOptions(event);
   }
-
-  // If the user already has authenticators registered, then let's offer an assertion challenge along with our attestation challenge
-  if (event.request.userAttributes["custom:credentials"]) {
+  if (
+    !!event.request.userAttributes["custom:credentials"] ||
+    event.userName === "usernameless"
+  ) {
     return webAuthnProvider.generateAuthenticationOptions(event);
   }
-
-  throw new Error("Unexpected auth challenge");
+  // If the user already has authenticators registered, then let's offer an assertion challenge along with our attestation challenge
+  throw new Error("Unable to Create Auth Challenge");
 };

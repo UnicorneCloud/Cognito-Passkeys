@@ -7,10 +7,20 @@ import { ApiStack } from "../lib/api-stack";
 
 const app = new cdk.App();
 
-const websiteStack = new WebsiteStack(app, "webauthn-website-stack");
+const baseDomainName = app.node.tryGetContext("domainName");
+const props = {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+  baseDomainName,
+  domainName: `passkeys.${baseDomainName}`,
+};
+
+new WebsiteStack(app, "webauthn-website-stack", props);
 
 const { userPool } = new WebAuthnCognitoStack(app, "webauthn-cognito-stack", {
-  domainName: websiteStack.cloudFrontWebDistribution.domainName,
+  ...props,
 });
 
-new ApiStack(app, "webauthn-api-stack", { userPool });
+new ApiStack(app, "webauthn-api-stack", { ...props, userPool });

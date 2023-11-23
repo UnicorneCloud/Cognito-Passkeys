@@ -3,7 +3,11 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { ProvideAuth } from "./contexts/ProvideAuth.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  redirect,
+  RouterProvider,
+} from "react-router-dom";
 import Signup from "./views/Signup.tsx";
 import Login from "./views/Login.tsx";
 import Activation from "./views/Activation.tsx";
@@ -13,9 +17,12 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    handle: () => {
+      return redirect("/signup");
+    },
     children: [
       {
-        path: "signup",
+        path: "",
         element: <Signup />,
       },
       {

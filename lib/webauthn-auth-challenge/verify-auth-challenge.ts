@@ -1,6 +1,6 @@
 import { MetadataService } from "@simplewebauthn/server";
 import { VerifyAuthChallengeResponseTriggerHandler } from "aws-lambda";
-import { CognitoAuthService } from "./providers/cognito-provider";
+import { CognitoAuthService, CognitoUser } from "./providers/cognito-provider";
 import { WebauthnProvider } from "./providers/webauthn-provider";
 
 const DOMAIN_NAME = process.env.DOMAIN_NAME;
@@ -31,8 +31,8 @@ export const handler: VerifyAuthChallengeResponseTriggerHandler = async (
     throw new Error("Authentication code mismatch");
   }
 
+  // This is a registration (creation of passkey)
   if (challengeAnswer.response.attestationObject) {
-    // This is a registration
     const authentication = await webAuthnProvider.verifyRegistrationResponse(
       event,
       origin
@@ -56,22 +56,42 @@ export const handler: VerifyAuthChallengeResponseTriggerHandler = async (
     return authentication.event;
   }
 
-  // Is authentication or registration ?
+  // Is it authentication (validation of a passkey)
   if (!challengeAnswer.response.attestationObject) {
-    const authentication = await webAuthnProvider.verifyAuthenticationResponse(
-      event,
-      origin
-    );
+    let user: CognitoUser;
+    let userName = event.userName;
+    // If we try a usernameless authentication
+    // WARNING: This actually not work at all
+    if (event.userName === "usernameless") {
+      // Get cognito user by reading username from the challenge answer
+      const { challengeAnswer } = JSON.parse(event.request.challengeAnswer);
+      user = await cognitoService.getUser(challengeAnswer.response.userHandle);
 
-    if (authentication.newCredentialsValue) {
+      // Complete credentials data (existing passkeys) which can is normally filled by cognito
+      // If we are not in a usernameless authentication.
+      // This will allow to verify that the passkey is correctly registered to this user in our system.
+      event.request.userAttributes["custom:credentials"] =
+        user["custom:credentials"];
+      // Also override userName
+      userName = user.username;
+      event.userName = user.username;
+    }
+
+    // Verify authentication response
+    const { newCredentialsValue, event: resultEvent } =
+      await webAuthnProvider.verifyAuthenticationResponse(event, origin);
+
+    // Update old credentials (typically incrementing "counter" field)
+
+    if (newCredentialsValue) {
       await cognitoService.updateCustomAttribute(
-        event.userName,
+        userName,
         "credentials",
-        authentication.newCredentialsValue
+        newCredentialsValue
       );
     }
 
-    return authentication.event;
+    return resultEvent;
   }
 
   throw new Error("Unexpected auth challenge");

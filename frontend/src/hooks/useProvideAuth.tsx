@@ -17,16 +17,10 @@ export const useProvideAuth = () => {
 
   const [responseDebug, setResponseDebug] = useState<object>();
 
-  const [cognitoError, setCognitoError] = useState<any>(null);
-  const handleCognitoError = (error: any) => {
-    if (!!error && error.code) {
-      console.error(error);
-      setCognitoError(error);
-    }
-  };
+  const [error, setError] = useState<any>(null);
 
   const signUp = async (email: string): Promise<void> => {
-    setCognitoError(null);
+    setError(null);
     try {
       await Auth.signUp({
         username: email,
@@ -36,7 +30,8 @@ export const useProvideAuth = () => {
         password: generatePassword(),
       });
     } catch (error) {
-      handleCognitoError(error);
+      setError(error);
+
       throw error;
     }
   };
@@ -45,46 +40,65 @@ export const useProvideAuth = () => {
     email: string,
     activationCode: string
   ): Promise<void> => {
-    setCognitoError(null);
-    const cognitoUser = await Auth.signIn(email, "", {
-      activationCode,
-    });
+    setError(null);
+    try {
+      const cognitoUser = await Auth.signIn(email, "", {
+        activationCode,
+      });
 
-    if (cognitoUser.authenticationFlowType === "CUSTOM_AUTH") {
-      const opts = JSON.parse(cognitoUser.challengeParam.attestationChallenge);
-      setResponseDebug(opts);
-      console.log("🚀 ~ file: useProvideAuth.tsx:43 ~ signUp ~ opts:", opts);
-      const attResp = await startRegistration(opts);
-      console.log(
-        "🚀 ~ file: useProvideAuth.tsx:45 ~ signUp ~ attResp:",
-        attResp
-      );
-      setResponseDebug(attResp);
+      if (cognitoUser.authenticationFlowType === "CUSTOM_AUTH") {
+        const opts = JSON.parse(
+          cognitoUser.challengeParam.attestationChallenge
+        );
+        setResponseDebug(opts);
+        const attResp = await startRegistration(opts);
 
-      await Auth.sendCustomChallengeAnswer(
-        cognitoUser,
-        JSON.stringify({
-          challengeAnswer: attResp,
-          activationCode,
-        })
-      );
+        setResponseDebug({
+          ...attResp,
+          response: {
+            ...attResp.response,
+            clientDataJSON: JSON.parse(atob(attResp.response.clientDataJSON)),
+          },
+        });
 
-      // Now logged !
-      const session = await Auth.currentSession();
-      setUserToken(session);
+        await Auth.sendCustomChallengeAnswer(
+          cognitoUser,
+          JSON.stringify({
+            challengeAnswer: attResp,
+            activationCode,
+          })
+        );
+
+        // Now logged !
+        const session = await Auth.currentSession();
+        setUserToken(session);
+      }
+    } catch (error) {
+      setError(error);
+
+      throw error;
     }
   };
 
   const login = async (email: string): Promise<void> => {
-    setCognitoError(null);
+    setError(null);
     try {
-      const cognitoUser = await Auth.signIn({ username: email, password: "" });
+      const cognitoUser = await Auth.signIn({
+        username: email,
+        password: "",
+      });
 
       if (cognitoUser.authenticationFlowType === "CUSTOM_AUTH") {
         const opts = JSON.parse(cognitoUser.challengeParam.assertionChallenge);
         setResponseDebug(opts);
-        const attResp = await startAuthentication(opts);
-        setResponseDebug(attResp);
+        const attResp = await startAuthentication(opts, true);
+        setResponseDebug({
+          ...attResp,
+          response: {
+            ...attResp.response,
+            clientDataJSON: JSON.parse(atob(attResp.response.clientDataJSON)),
+          },
+        });
 
         await Auth.sendCustomChallengeAnswer(
           cognitoUser,
@@ -97,7 +111,7 @@ export const useProvideAuth = () => {
         setUserToken(session);
       }
     } catch (error) {
-      handleCognitoError(error);
+      setError(error);
       throw error;
     }
   };
@@ -114,6 +128,6 @@ export const useProvideAuth = () => {
     logout,
     activateAccount,
     responseDebug,
-    cognitoError,
+    error,
   };
 };

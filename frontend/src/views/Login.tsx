@@ -8,6 +8,10 @@ function Login() {
     await login(email);
   };
 
+  const handleUsernamelessLogin = async () => {
+    await login("usernameless");
+  };
+
   return (
     <div>
       <h3>3: Login</h3>
@@ -17,13 +21,16 @@ function Login() {
         <input
           id="loginEmail"
           type="text"
+          autoComplete="username webauthn"
           value={email}
-          autoComplete="userName webauthn"
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
       <button onClick={handleLogin}>Login</button>
+      <hr />
+      <p>Or login with usernameless authentication</p>
+      <button onClick={handleUsernamelessLogin}>Login</button>
     </div>
   );
 }

@@ -26,7 +26,10 @@ export function generateBasicLambdaRole(
 
   const cognitoIdpPolicy = new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,
-    actions: ["cognito-idp:AdminUpdateUserAttributes"],
+    actions: [
+      "cognito-idp:AdminUpdateUserAttributes",
+      "cognito-idp:AdminGetUser",
+    ],
     resources: ["*"],
   });
   writeRole.addToPolicy(cognitoIdpPolicy);

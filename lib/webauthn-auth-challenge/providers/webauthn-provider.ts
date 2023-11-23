@@ -15,6 +15,7 @@ import {
   convertObjectIntoUint8Array,
 } from "../../common";
 import base64url from "base64url";
+import { CognitoUser } from "./cognito-provider";
 
 export type WebauthnProviderProps = {
   rpName: string;
@@ -35,9 +36,9 @@ export class WebauthnProvider {
     event:
       | CreateAuthChallengeTriggerEvent
       | VerifyAuthChallengeResponseTriggerEvent
-  ): WebAuthnAuthenticator[] {
+  ): WebAuthnAuthenticator[] | undefined {
     if (!event.request.userAttributes["custom:credentials"]) {
-      return [];
+      return undefined;
     }
 
     const cognitoAuthenticatorCreds: WebAuthnAuthenticator[] = JSON.parse(
@@ -62,7 +63,7 @@ export class WebauthnProvider {
     const options = await generateRegistrationOptions({
       rpName: this.rpName,
       rpID: this.rpId,
-      userID: event.request.userAttributes.sub,
+      userID: event.userName,
       userDisplayName: event.userName,
       userName: event.userName,
       timeout: TIMEOUT,
@@ -74,7 +75,7 @@ export class WebauthnProvider {
       // Support the two most common algorithms: ES256, and RS256
       supportedAlgorithmIDs: [-7, -257],
       // Exclude already added credentials
-      excludeCredentials: authenticators.map((authenticator) => ({
+      excludeCredentials: authenticators?.map((authenticator) => ({
         id: authenticator.credentialID,
         type: "public-key",
         transports: authenticator.transports,
@@ -91,12 +92,15 @@ export class WebauthnProvider {
 
   async generateAuthenticationOptions(event: CreateAuthChallengeTriggerEvent) {
     // Parse the list of stored authenticators from the Cognito user.
-    const authenticators = this.parseAuthenticators(event);
+    let authenticators: WebAuthnAuthenticator[] | undefined = undefined;
+    if (event.request.userAttributes["custom:credentials"]) {
+      authenticators = this.parseAuthenticators(event);
+    }
 
     const options = await generateAuthenticationOptions({
       timeout: TIMEOUT,
       // Require users to use a previously-registered authenticator
-      allowCredentials: authenticators.map((authenticator) => ({
+      allowCredentials: authenticators?.map((authenticator) => ({
         id: authenticator.credentialID,
         type: "public-key",
         transports: authenticator.transports,
@@ -121,8 +125,14 @@ export class WebauthnProvider {
     origin: string
   ) {
     const { challengeAnswer } = JSON.parse(event.request.challengeAnswer);
-    // Find current used authenticated by compare rawId
+
+    // Find current used authenticator by compare rawId
     const authenticators = this.parseAuthenticators(event);
+
+    if (!authenticators || !authenticators.length) {
+      // Do no throw really this error, this is for demo purpose
+      throw new Error("No authenticator registered to this account");
+    }
     let authenticator =
       authenticators.find(
         ({ credentialID }) =>
@@ -147,6 +157,10 @@ export class WebauthnProvider {
 
     if (verification.verified) {
       const { authenticationInfo } = verification;
+      console.log(
+        "🚀 ~ file: webauthn-provider.ts:152 ~ WebauthnProvider ~ authenticationInfo:",
+        authenticationInfo
+      );
 
       const { newCounter } = authenticationInfo;
       authenticator.counter = newCounter;
@@ -168,6 +182,7 @@ export class WebauthnProvider {
 
       return {
         event,
+        challengeAnswer,
         newCredentialsValue,
       };
     } else {
@@ -184,7 +199,7 @@ export class WebauthnProvider {
   ) {
     const { challengeAnswer } = JSON.parse(event.request.challengeAnswer);
     // Find current used authenticated by compare rawId
-    const authenticators = this.parseAuthenticators(event);
+    const authenticators = this.parseAuthenticators(event) ?? [];
 
     const data = {
       response: challengeAnswer,

@@ -13,7 +13,9 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     code
   );
 
-  const url = `https://${DOMAIN_NAME}/activation?activationCode=${code}`;
+  const url = `https://${DOMAIN_NAME}/activation?activationCode=${code}&email=${encodeURIComponent(
+    event.userName
+  )}`;
   await AwsSesEmailSender.sendActivationEmail(event.userName, url);
 
   return event;

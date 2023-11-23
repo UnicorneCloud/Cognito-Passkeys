@@ -7,12 +7,12 @@ import LogoUnicorne from "./assets/logo-unicorne.png";
 import { useEffect, useRef } from "react";
 
 function App() {
-  const { responseDebug, cognitoError } = useAuth();
+  const { responseDebug, error } = useAuth();
 
   const location = useLocation();
   const snackBarRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (snackBarRef.current && cognitoError) {
+    if (snackBarRef.current && error) {
       snackBarRef.current.className = "show";
       setTimeout(() => {
         if (snackBarRef.current) {
@@ -23,19 +23,19 @@ function App() {
         }
       }, 5500);
     }
-  }, [cognitoError, snackBarRef]);
+  }, [error, snackBarRef]);
 
   return (
     <>
-      {cognitoError && (
+      {error && (
         <div id="snackbar" ref={snackBarRef} className="show">
-          {cognitoError.message}
+          {error.message}
         </div>
       )}
       <h1>Passwordless authentication with Cognito</h1>
       <h2>FIDO2 WebAuthn Passkey authentication</h2>
       <nav>
-        <Link to="signup">Signup</Link>
+        <Link to="">Signup</Link>
         <Link to="activation">Activation</Link>
         <Link to="login">Login</Link>
         <Link to="authenticated">Authenticated</Link>

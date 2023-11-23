@@ -9,7 +9,8 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "npx cdk deploy --all --profile hackathon"
+    "frontend:build": "cd frontend && yarn build && cd ..",
+    "deploy": "yarn frontend:build && npx cdk deploy --all"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.125",
