@@ -53,10 +53,12 @@ a {
 }
 
 input {
-  width: 270px;
+  width: 90%;
+  max-width: 260px;
 }
 button {
-  width: 270px;
+  width: 90%;
+  max-width: 260px;
   color: #1f0a30 !important;
   background-color: #19ece6;
 }
@@ -65,6 +67,7 @@ nav {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .logoUnicorne {

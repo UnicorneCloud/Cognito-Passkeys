@@ -4,7 +4,7 @@ Enhance AWS Cognito to initiate FIDO2 Passwordless Authentication.
 
 Demo: [https://passkeys.unicornpowered.io](https://passkeys.unicornpowered.io)
 
-> Disclaimer note: Do not use this project directly in production. It may be result of potential data privacy breach, it's just a proof of concept of how to use AWS Cognito with FIDO2 Authentication (Passkeys). You have to adapt it before using it !
+> Disclaimer note: Do not use this project directly in production. It may be result of potential data breacj, it's just a proof of concept of how to use AWS Cognito with FIDO2 Authentication (Passkeys). We have also tried some things just for fun.
 
 ![Architecture diagram](architecture-diagram.png)
 
@@ -24,7 +24,7 @@ Under the `frontend`` folder:
 
 ## Deploy
 
-Under the `frontend`` folder:
+Under the `frontend` folder:
 
 - `yarn build` build frontend
 
